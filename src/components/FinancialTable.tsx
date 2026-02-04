@@ -128,7 +128,9 @@ const FinancialTable = ({ data }: FinancialTableProps) => {
                 <td
                   className={`border border-gray-800 p-2.5 text-right ${(instrument.price ?? 0) >= 0 ? "text-blue-600" : "text-red-600"}`}
                 >
-                  ${(instrument.price ?? 0).toFixed(2)}
+                  {instrument.price != null
+                    ? `$${instrument.price.toFixed(2)}`
+                    : "-"}
                 </td>
               </tr>
             );

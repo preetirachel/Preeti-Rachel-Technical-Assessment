@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import FinancialTable from './components/FinancialTable';
-import { fetchFinancialInstruments } from './services/financialApi';
+import { useState, useEffect } from "react";
+import FinancialTable from "./components/FinancialTable";
+import { fetchFinancialInstruments } from "./services/financialApi";
 
 export default function App() {
   const [data, setData] = useState([]);
@@ -13,8 +13,7 @@ export default function App() {
         const instruments = await fetchFinancialInstruments();
         setData(instruments);
       } catch (error) {
-        console.error('Failed to load data:', error);
-        setError('Error loading data');
+        setError("Error loading data");
       } finally {
         setLoading(false);
       }

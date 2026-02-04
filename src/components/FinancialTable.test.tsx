@@ -16,17 +16,19 @@ const mockData: Array<{
 describe("FinancialTable", () => {
   test("renders table with data", () => {
     render(<FinancialTable data={mockData} />);
-    expect(screen.getByText("BETA")).toBeVisible();
-    expect(screen.getByText("GAMMA")).toBeVisible();
-    expect(screen.getByText("ALPHA")).toBeVisible();
-    expect(screen.getByText("ETA")).toBeVisible();
+    expect(screen.getByRole("cell", { name: "BETA" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "GAMMA" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "ALPHA" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: "ETA" })).toBeInTheDocument();
   });
 
   test("sorts by asset class - Equities first, Macro, Credit last", async () => {
     const user = userEvent.setup();
     render(<FinancialTable data={mockData} />);
 
-    await user.click(screen.getByText("Sort by Asset Class"));
+    await user.click(
+      screen.getByRole("button", { name: "Sort by Asset Class" }),
+    );
 
     const rows = screen.getAllByRole("row");
     expect(rows[1]).toHaveTextContent("BETA");
@@ -43,7 +45,7 @@ describe("FinancialTable", () => {
     const user = userEvent.setup();
     render(<FinancialTable data={mockData} />);
 
-    await user.click(screen.getByText("Sort by Price"));
+    await user.click(screen.getByRole("button", { name: "Sort by Price" }));
 
     const rows = screen.getAllByRole("row");
     expect(rows[1]).toHaveTextContent("BETA");
@@ -60,7 +62,7 @@ describe("FinancialTable", () => {
     const user = userEvent.setup();
     render(<FinancialTable data={mockData} />);
 
-    await user.click(screen.getByText("Sort by Ticker"));
+    await user.click(screen.getByRole("button", { name: "Sort by Ticker" }));
 
     const rows = screen.getAllByRole("row");
     expect(rows[1]).toHaveTextContent("ALPHA");
@@ -71,34 +73,64 @@ describe("FinancialTable", () => {
 
   test("displays positive prices in blue", () => {
     render(<FinancialTable data={mockData} />);
-    const positivePrice = screen.getByText("$3791.37");
+    const positivePrice = screen.getByRole("cell", { name: "$3791.37" });
     expect(positivePrice).toHaveClass("text-blue-600");
   });
 
   test("displays negative prices in red", () => {
     render(<FinancialTable data={mockData} />);
-    const negativePrice = screen.getByText("$-2299.10");
+    const negativePrice = screen.getByRole("cell", { name: "$-2299.10" });
     expect(negativePrice).toHaveClass("text-red-600");
   });
 
   test("applies blue background to Equities rows", () => {
     render(<FinancialTable data={mockData} />);
-    const betaCell = screen.getByText("BETA");
+    const betaCell = screen.getByRole("cell", { name: "BETA" });
     const equitiesRow = betaCell.closest("tr");
     expect(equitiesRow).toHaveClass("bg-blue-100");
   });
 
   test("applies white background to Macro rows", () => {
     render(<FinancialTable data={mockData} />);
-    const etaCell = screen.getByText("ETA");
+    const etaCell = screen.getByRole("cell", { name: "ETA" });
     const macroRow = etaCell.closest("tr");
     expect(macroRow).toHaveClass("bg-white");
   });
 
   test("applies green background to Credit rows", () => {
     render(<FinancialTable data={mockData} />);
-    const alphaCell = screen.getByText("ALPHA");
+    const alphaCell = screen.getByRole("cell", { name: "ALPHA" });
     const creditRow = alphaCell.closest("tr");
     expect(creditRow).toHaveClass("bg-green-100");
+  });
+
+  test("clears sorting when Clear button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FinancialTable data={mockData} />);
+    await user.click(screen.getByRole("button", { name: "Sort by Price" }));
+    let rows = screen.getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("BETA");
+
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+    rows = screen.getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("BETA");
+    expect(rows[2]).toHaveTextContent("GAMMA");
+    expect(rows[3]).toHaveTextContent("ALPHA");
+    expect(rows[4]).toHaveTextContent("ETA");
+  });
+
+  test("displays message when no data is provided", () => {
+    render(<FinancialTable data={[]} />);
+    expect(
+      screen.getByText("No financial data available."),
+    ).toBeInTheDocument();
+  });
+
+  test("displays dash for null price", () => {
+    const dataWithNullPrice = [
+      { ticker: "TEST", price: null as any, assetClass: "Equities" as const },
+    ];
+    render(<FinancialTable data={dataWithNullPrice} />);
+    expect(screen.getByRole("cell", { name: "-" })).toBeInTheDocument();
   });
 });
