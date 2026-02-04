@@ -29,7 +29,7 @@ open coverage/lcov-report/index.html
 
 ## Project Structure
 
-- **App.jsx** - Main application component
-- **components/FinancialTable.tsx** - Table component with sorting logic
-- **services/financialApi.ts** - Data fetching function
-- **services/sampleData.json** - Sample financial data
+- **components/FinancialTable.tsx** - Table component withn the sorting logic
+- **services/financialApi.ts** -This function fetches the data from sampledata.json
+- Test files are added for all files
+- I have added null checks, error handling and used typescript to handle code stability
